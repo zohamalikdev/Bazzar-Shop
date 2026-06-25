@@ -2091,54 +2091,19 @@ footer {
     }
 
     /* Features */
-   /* =====================================================
-   FEATURES SECTION — RESPONSIVE
-   Paste this at the bottom of your CSS file
-===================================================== */
-
-/* ── TABLET (≤ 900px) ────────────────────────────── */
-@media (max-width: 900px) {
     .features-section {
-        padding: 50px 20px;
+        padding: 60px 16px;
     }
 
     .features-grid {
         grid-template-columns: 1fr 1fr;
-        gap: 16px;
+        border: none;
+        gap: 1px;
     }
 
     .feature-item {
-        padding: 24px 16px;
-    }
-}
-
-/* ── MOBILE (≤ 600px) ────────────────────────────── */
-    .features-section {
-        padding: 40px 16px;
-    }
-
-    .section-title {
-        font-size: 1.8rem;
-        text-align: center;
-    }
-
-    .section-title span {
-        font-size: 2.2rem !important;
-        letter-spacing: 1px !important;
-    }
-
-    .features-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
-
-    .feature-item {
-        padding: 20px 16px;
-        text-align: center;
-    }
-
-    .feature-icon-wrap {
-        margin: 0 auto 12px auto;
+        border: 1px solid var(--border);
+        border-right: 1px solid var(--border);
     }
 
     /* Footer */
