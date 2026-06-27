@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BAZZAR - Shop</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:wght@700;900&display=swap"
+        rel="stylesheet" />
+</head>
+
+<body>
+
+    <!-- SHOP NAVBAR -->
+    <nav class="shop-navbar">
+        <a href="index.html" class="logo">BAZZAR</a>
+
+        <div class="search-bar">
+            <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input type="text" id="searchInput" placeholder="Search products..." oninput="searchProducts()" />
+        </div>
+
+        <div style="display:flex; align-items:center; gap:12px;">
+            <div class="cart-icon" onclick="toggleCart()">
+                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <path d="M16 10a4 4 0 0 1-8 0" />
+                </svg>
+                <span class="cart-badge" id="cartBadge">0</span>
+            </div>
+
+            <div class="user-menu" id="userMenuSection" style="display:none;">
+                <button class="btn-solid" onclick="toggleDropdown()" id="userBtn">User</button>
+                <div class="dropdown" id="userDropdown">
+                    <a href="#" onclick="showOrders()">My Orders</a>
+                    <a href="#" onclick="handleLogout()">Logout</a>
+                    <a href="#" onclick="deleteProfile()" class="danger">Delete Profile</a>
+                </div>
+            </div>
+
+            <div id="guestSection">
+                <button class="btn-solid" onclick="window.location.href='index.html'">Login</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- SHOP CONTENT -->
+    <div class="shop-container">
+        <div class="filter-bar">
+            <button class="filter-btn active" onclick="filterCategory('')">All</button>
+            <button class="filter-btn" onclick="filterCategory('Electronics')">Electronics</button>
+            <button class="filter-btn" onclick="filterCategory('Accessories')">Accessories</button>
+            <button class="filter-btn" onclick="filterCategory('Fashion')">Fashion</button>
+            <button class="filter-btn" onclick="filterCategory('Cosmetics')">Cosmetics</button>
+            <button class="filter-btn" onclick="filterCategory('Home Appliances')">Home Appliances</button>
+        </div>
+
+        <div class="products-grid" id="productsGrid">
+            <p class="loading-text">Loading products...</p>
+        </div>
+    </div>
+
+    <!-- CART SIDE PANEL -->
+    <div class="cart-panel" id="cartPanel">
+        <div class="cart-header">
+            <h2>Your Cart</h2>
+            <button class="close-btn" onclick="toggleCart()">&#x2715;</button>
+        </div>
+        <div class="cart-items" id="cartItems"></div>
+        <div class="cart-footer">
+            <div class="cart-total" id="cartTotal">Total: Rs 0.00</div>
+            <button class="btn-checkout" onclick="openDeliveryModal()">Checkout Now</button>
+        </div>
+    </div>
+
+    <!-- DELIVERY DETAILS MODAL -->
+    <div class="modal-overlay" id="deliveryModal">
+        <div class="delivery-modal">
+            <button class="close-btn" onclick="closeModal('deliveryModal')">&#x2715;</button>
+            <h2>Delivery Details</h2>
+            <input type="text" id="fullName" placeholder="Enter your name" />
+            <input type="text" id="phoneNumber" placeholder="03xx-xxxxxxxx" />
+            <input type="text" id="altPhone" placeholder="Alternate Phone Number (Optional)" />
+            <input type="email" id="emailAddress" placeholder="Email Address" />
+            <textarea id="deliveryAddress" placeholder="Street, City, Area"></textarea>
+            <div class="total-amount" id="modalTotal">Total Amount: Rs 0.00</div>
+            <button class="btn-submit" onclick="placeOrder()">Confirm and Place Order</button>
+        </div>
+    </div>
+
+    <!-- RECEIPT MODAL -->
+    <div class="modal-overlay" id="receiptModal">
+        <div class="receipt">
+            <div class="receipt-check">
+                <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <polyline points="20 6 9 17 4 12" />
+                </svg>
+            </div>
+            <h2>Order Confirmed</h2>
+            <p class="receipt-sub">Thank you for shopping with BAZZAR</p>
+            <div class="receipt-details" id="receiptDetails"></div>
+            <div class="receipt-total" id="receiptTotal"></div>
+            <button class="btn-submit" onclick="closeModal('receiptModal')"
+                style="width:100%;padding:14px;background:#2bbfab;color:white;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;margin-top:10px;">Done</button>
+        </div>
+    </div>
+
+    <!-- MY ORDERS MODAL -->
+    <div class="modal-overlay" id="ordersModal">
+        <div class="orders-modal">
+            <button class="close-btn" onclick="closeModal('ordersModal')">&#x2715;</button>
+            <h2>My Orders</h2>
+            <div id="ordersList"></div>
+        </div>
+    </div>
+
+    <script>
+        const API = 'https://bazzar-backend-production.up.railway.app';
+        let cart = [];
+        let allProducts = [];
+        let currentCategory = '';
+
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        window.onload = function () {
+            if (user) {
+                document.getElementById('userMenuSection').style.display = 'block';
+                document.getElementById('guestSection').style.display = 'none';
+                document.getElementById('userBtn').textContent = user.name;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const cat = urlParams.get('category');
+            if (cat) {
+                currentCategory = cat;
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.textContent === cat) btn.classList.add('active');
+                });
+            }
+
+            loadProducts();
+        };
+
+        async function loadProducts() {
+            try {
+                let url = `${API}/products`;
+                if (currentCategory) url += `?category=${currentCategory}`;
+
+                const res = await fetch(url);
+                allProducts = await res.json();
+                displayProducts(allProducts);
+            } catch (err) {
+                document.getElementById('productsGrid').innerHTML = '<p class="loading-text">Could not load products. Make sure server is running!</p>';
+            }
+        }
+
+        function displayProducts(products) {
+            const grid = document.getElementById('productsGrid');
+            if (products.length === 0) {
+                grid.innerHTML = '<p class="loading-text">No products found.</p>';
+                return;
+            }
+
+            grid.innerHTML = products.map(p => `
+      <div class="product-card">
+        <div class="product-img-wrap">
+          <img src="${p.image_url}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/400x220?text=No+Image'"/>
+          <span class="stock-badge ${p.stock > 0 ? 'in-stock' : 'out-stock'}">
+            ${p.stock > 0 ? 'In Stock' : 'Out of Stock'}
+          </span>
+        </div>
+        <div class="product-info">
+          <span class="product-category">${p.category}</span>
+          <h3>${p.name}</h3>
+          <p>${p.description}</p>
+          <div class="product-footer">
+            <div class="price">Rs ${parseFloat(p.price).toFixed(2)}</div>
+            <button class="btn-add-cart"
+              onclick="addToCart(${p.id}, '${p.name.replace(/'/g, "\\'")}', ${p.price}, '${p.image_url}')"
+              ${p.stock === 0 ? 'disabled' : ''}>
+              ${p.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+            </button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+        }
+
+        function searchProducts() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allProducts.filter(p =>
+                p.name.toLowerCase().includes(query) ||
+                p.description.toLowerCase().includes(query)
+            );
+            displayProducts(filtered);
+        }
+
+        function filterCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((cat === '' && btn.textContent === 'All') || btn.textContent === cat) {
+                    btn.classList.add('active');
+                }
+            });
+            loadProducts();
+        }
+
+        function addToCart(id, name, price, image) {
+            const existing = cart.find(item => item.id === id);
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ id, name, price: parseFloat(price), image, quantity: 1 });
+            }
+            updateCartUI();
+            document.getElementById('cartPanel').classList.add('open');
+        }
+
+        function updateCartUI() {
+            const badge = document.getElementById('cartBadge');
+            const itemsDiv = document.getElementById('cartItems');
+            const totalDiv = document.getElementById('cartTotal');
+
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            badge.textContent = totalItems;
+
+            if (cart.length === 0) {
+                itemsDiv.innerHTML = '<p class="cart-empty">Your cart is empty</p>';
+                totalDiv.textContent = 'Total: Rs 0.00';
+                return;
+            }
+
+            itemsDiv.innerHTML = cart.map(item => `
+      <div class="cart-item">
+        <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/70'"/>
+        <div class="cart-item-info">
+          <h4>${item.name}</h4>
+          <p>Rs ${item.price.toFixed(2)} x ${item.quantity}</p>
+        </div>
+        <button class="remove-item" onclick="removeFromCart(${item.id})">&#x2715;</button>
+      </div>
+    `).join('');
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            totalDiv.textContent = `Total: Rs ${total.toFixed(2)}`;
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(item => item.id !== id);
+            updateCartUI();
+        }
+
+        function toggleCart() {
+            document.getElementById('cartPanel').classList.toggle('open');
+        }
+
+        function toggleDropdown() {
+            document.getElementById('userDropdown').classList.toggle('active');
+        }
+
+        document.addEventListener('click', function (e) {
+            const menu = document.getElementById('userMenuSection');
+            if (menu && !menu.contains(e.target)) {
+                document.getElementById('userDropdown').classList.remove('active');
+            }
+        });
+
+        function openDeliveryModal() {
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            document.getElementById('modalTotal').textContent = `Total Amount: Rs ${total.toFixed(2)}`;
+            document.getElementById('deliveryModal').classList.add('active');
+        }
+
+        async function placeOrder() {
+            const fullName = document.getElementById('fullName').value.trim();
+            const phone = document.getElementById('phoneNumber').value.trim();
+            const address = document.getElementById('deliveryAddress').value.trim();
+
+            if (!fullName || !phone || !address) {
+                alert('Please fill in Name, Phone and Address!');
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            const orderData = {
+                user_id: user ? user.id : null,
+                full_name: fullName,
+                phone: phone,
+                address: address,
+                total: total,
+                items: cart.map(item => ({
+                    product_id: item.id,
+                    quantity: item.quantity,
+                    price: item.price
+                }))
+            };
+
+            try {
+                const res = await fetch(`${API}/orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderData)
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    closeModal('deliveryModal');
+                    document.getElementById('cartPanel').classList.remove('open');
+                    showReceipt(fullName, phone, address, total);
+                    cart = [];
+                    updateCartUI();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (err) {
+                alert('Could not connect to server!');
+            }
+        }
+
+        function showReceipt(name, phone, address, total) {
+            document.getElementById('receiptDetails').innerHTML = `
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Phone:</strong> ${phone}</p>
+      <p><strong>Address:</strong> ${address}</p>
+      <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+    `;
+            document.getElementById('receiptTotal').textContent = `Total Paid: Rs ${total.toFixed(2)}`;
+            document.getElementById('receiptModal').classList.add('active');
+        }
+
+        async function showOrders() {
+            toggleDropdown();
+            if (!user) return;
+
+            try {
+                const res = await fetch(`${API}/orders/user/${user.id}`);
+                const orders = await res.json();
+
+                const list = document.getElementById('ordersList');
+
+                if (orders.length === 0) {
+                    list.innerHTML = '<p style="color:#999;">No orders yet.</p>';
+                } else {
+                    list.innerHTML = orders.map(o => `
+          <div class="order-card">
+            <h4>Order #${o.id}</h4>
+            <p><strong>Address:</strong> ${o.address}</p>
+            <p><strong>Total:</strong> Rs ${parseFloat(o.total).toFixed(2)}</p>
+            <p><strong>Date:</strong> ${new Date(o.created_at).toLocaleDateString()}</p>
+            <span class="order-status status-${o.status.toLowerCase()}">${o.status}</span>
+          </div>
+        `).join('');
+                }
+
+                document.getElementById('ordersModal').classList.add('active');
+            } catch (err) {
+                alert('Could not load orders!');
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+
+        async function deleteProfile() {
+            if (!confirm('Are you sure you want to delete your account? This cannot be undone!')) return;
+
+            try {
+                await fetch(`${API}/user/${user.id}`, { method: 'DELETE' });
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                alert('Account deleted.');
+                window.location.href = 'index.html';
+            } catch (err) {
+                alert('Error deleting account!');
+            }
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function (e) {
+                if (e.target === this) this.classList.remove('active');
+            });
+        });
+    </script>
+
+
+    <script>
+        const navbar = document.querySelector('.navbar');
+        if (navbar) {
+            window.addEventListener('scroll', () => {
+                navbar.classList.toggle('scrolled', window.scrollY > 40);
+            });
+        }
+
+        // Fade-up on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) e.target.classList.add('visible');
+            });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+    </script>
+
+</body>
+
+</html>
