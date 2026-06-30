@@ -2,337 +2,214 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bazzar - Shop Smart, Live Better</title>
-    <link rel="stylesheet" href="style.css" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:wght@700;900&display=swap"
-        rel="stylesheet" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bazzar - Shop Smart, Live Better</title>
+  <link rel="stylesheet" href="style.css" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:wght@700;900&display=swap"
+    rel="stylesheet" />
 </head>
 
 <body>
 
-    <!-- NAVBAR -->
-    <nav class="navbar">
-        <a href="index.html" class="logo">Bazzar</a>
-        <ul class="nav-links">
-            <li><a href="index.html">Home</a></li>
-            <li><a href="#categories">Categories</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#footer">Contact</a></li>
+  <!-- ============== NAVBAR ============== -->
+  <nav class="navbar">
+    <a href="index.html" class="logo">Bazzar</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="#categories">Categories</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#footer">Contact</a></li>
+    </ul>
+    <div class="nav-buttons">
+      <button class="btn-outline" onclick="openModal('loginModal')">Login</button>
+      <button class="btn-solid" onclick="openModal('registerModal')">Register</button>
+    </div>
+  </nav>
+
+  <!-- ============== HERO SECTION ============== -->
+  <section class="hero">
+    <div class="hero-text">
+      <span class="hero-tag">New Arrivals 2026</span>
+      <h1>Shop Smart,<br><span>Live Better</span></h1>
+      <p>Discover curated essentials for modern living. Quality products delivered to your doorstep.</p>
+      <div class="hero-buttons">
+        <button class="btn-main" onclick="goToShop()">Shop Now</button>
+        <button class="btn-secondary" onclick="scrollToCategories()">Browse Categories</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item"><strong>10K+</strong><span>Products</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat-item"><strong>50K+</strong><span>Customers</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat-item"><strong>4.9</strong><span>Rating</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== CATEGORIES SECTION ============== -->
+  <section class="categories-section" id="categories">
+    <div class="section-header">
+      <h2 class="section-title">Browse Our <span>Categories</span></h2>
+      <p class="section-subtitle">Find everything you need in one place</p>
+    </div>
+    <div class="categories-grid">
+      <div class="category-card" onclick="goToCategory('Electronics')">
+        <img src="./images/watch.jpg" alt="Electronics" />
+        <div class="cat-overlay"></div>
+        <span class="cat-label">Electronics</span>
+      </div>
+      <div class="category-card" onclick="goToCategory('Accessories')">
+        <img src="./images/perfume.jpg" alt="Accessories" />
+        <div class="cat-overlay"></div>
+        <span class="cat-label">Accessories</span>
+      </div>
+      <div class="category-card" onclick="goToCategory('Fashion')">
+        <img src="./images/fashion.jpg" alt="Fashion" />
+        <div class="cat-overlay"></div>
+        <span class="cat-label">Fashion</span>
+      </div>
+      <div class="category-card" onclick="goToCategory('Cosmetics')">
+        <img src="./images/cosmetics.jpg" alt="Cosmetics" />
+        <div class="cat-overlay"></div>
+        <span class="cat-label">Cosmetics</span>
+      </div>
+      <div class="category-card category-card--wide" onclick="goToCategory('Home Appliances')">
+        <img src="./images/toaster.jpg" alt="Home Appliances" />
+        <div class="cat-overlay"></div>
+        <span class="cat-label">Home Appliances</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== ABOUT SECTION ============== -->
+  <section id="about" class="about-section">
+    <div class="about-inner">
+      <h2 class="section-title">About <span>BAZZAR</span></h2>
+      <p>
+        BAZZAR is your one-stop destination for curated modern essentials.
+        From electronics to fashion, we bring you quality products at great prices.
+        Our mission is simple — help you shop smart and live better.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============== FEATURES SECTION ============== -->
+  <section class="features-section">
+    <div class="section-header">
+      <h2 class="section-title">Why Choose <span class="features-bazzar-text">BAZZAR</span></h2>
+    </div>
+    <div class="features-grid">
+      <div class="feature-item">
+        <div class="feature-icon-wrap">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </div>
+        <h3>Fast Delivery</h3>
+        <p>Quick and reliable shipping to your door</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon-wrap">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="3" y="11" width="18" height="11" rx="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+        </div>
+        <h3>Secure Payment</h3>
+        <p>Your payment info is always safe</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon-wrap">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
+        </div>
+        <h3>High Quality</h3>
+        <p>Only curated top quality products</p>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon-wrap">
+          <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="1 4 1 10 7 10" />
+            <path d="M3.51 15a9 9 0 1 0 .49-3.51" />
+          </svg>
+        </div>
+        <h3>Easy Returns</h3>
+        <p>Hassle free return policy</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== FOOTER ============== -->
+  <footer id="footer">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">BAZZAR</div>
+        <p class="footer-tagline">Shop smart, live better.<br />Your modern shopping destination.</p>
+      </div>
+      <div>
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#footer">Contact</a></li>
+          <li><a href="#categories">Categories</a></li>
         </ul>
-        <div class="nav-buttons">
-            <button class="btn-outline" onclick="openModal('loginModal')">Login</button>
-            <button class="btn-solid" onclick="openModal('registerModal')">Register</button>
-        </div>
-    </nav>
-
-    <!-- HERO SECTION -->
-    <section class="hero">
-        <div class="hero-text">
-            <span class="hero-tag">New Arrivals 2026</span>
-            <h1>Shop Smart,<br><span>Live Better</span></h1>
-            <p>Discover curated essentials for modern living. Quality products delivered to your doorstep.</p>
-            <div class="hero-buttons">
-                <button class="btn-main" onclick="goToShop()">Shop Now</button>
-                <button class="btn-secondary" onclick="scrollToCategories()">Browse Categories</button>
-            </div>
-            <div class="hero-stats">
-                <div class="stat-item"><strong>10K+</strong><span>Products</span></div>
-                <div class="stat-divider"></div>
-                <div class="stat-item"><strong>50K+</strong><span>Customers</span></div>
-                <div class="stat-divider"></div>
-                <div class="stat-item"><strong>4.9</strong><span>Rating</span></div>
-            </div>
-        </div>
-       
-    </section>
-
-    <!-- CATEGORIES SECTION -->
-    <section class="categories-section" id="categories">
-        <div class="section-header">
-            <h2 class="section-title">Browse Our <span>Categories</span></h2>
-            <p class="section-subtitle">Find everything you need in one place</p>
-        </div>
-        <div class="categories-grid">
-            <div class="category-card" onclick="goToCategory('Electronics')">
-                <img src="./images/watch.jpg" alt="Electronics" />
-                <div class="cat-overlay"></div>
-                <span class="cat-label">Electronics</span>
-            </div>
-            <div class="category-card" onclick="goToCategory('Accessories')">
-                <img src="./images/perfume.jpg" alt="Accessories" />
-                <div class="cat-overlay"></div>
-                <span class="cat-label">Accessories</span>
-            </div>
-            <div class="category-card" onclick="goToCategory('Fashion')">
-                <img src="./images/fashion.jpg" alt="Fashion" />
-                <div class="cat-overlay"></div>
-                <span class="cat-label">Fashion</span>
-            </div>
-            <div class="category-card" onclick="goToCategory('Cosmetics')">
-                <img src="./images/cosmetics.jpg" alt="Cosmetics" />
-                <div class="cat-overlay"></div>
-                <span class="cat-label">Cosmetics</span>
-            </div>
-            <div class="category-card category-card--wide" onclick="goToCategory('Home Appliances')">
-                <img src="./images/toaster.jpg" alt="Home Appliances" />
-                <div class="cat-overlay"></div>
-                <span class="cat-label">Home Appliances</span>
-            </div>
-        </div>
-    </section>
-
-    <!-- ABOUT SECTION -->
-    <section id="about" class="about-section">
-        <div class="about-inner">
-            <h2 class="section-title">About <span>BAZZAR</span></h2>
-            <p>
-                BAZZAR is your one-stop destination for curated modern essentials.
-                From electronics to fashion, we bring you quality products at great prices.
-                Our mission is simple — help you shop smart and live better.
-            </p>
-        </div>
-    </section>
-
-    <!-- FEATURES SECTION -->
-    <section class="features-section">
-        <div class="section-header">
-            <h2 class="section-title">Why Choose <span style="font-size: 4.5rem ;  letter-spacing: 2px;"> BAZZAR </span></h2>
-        </div>
-        <div class="features-grid">
-            <div class="feature-item">
-                <div class="feature-icon-wrap">
-                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
-                </div>
-                <h3>Fast Delivery</h3>
-                <p>Quick and reliable shipping to your door</p>
-            </div>
-            <div class="feature-item">
-                <div class="feature-icon-wrap">
-                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <rect x="3" y="11" width="18" height="11" rx="2" />
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                    </svg>
-                </div>
-                <h3>Secure Payment</h3>
-                <p>Your payment info is always safe</p>
-            </div>
-            <div class="feature-item">
-                <div class="feature-icon-wrap">
-                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <polygon
-                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                    </svg>
-                </div>
-                <h3>High Quality</h3>
-                <p>Only curated top quality products</p>
-            </div>
-            <div class="feature-item">
-                <div class="feature-icon-wrap">
-                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <polyline points="1 4 1 10 7 10" />
-                        <path d="M3.51 15a9 9 0 1 0 .49-3.51" />
-                    </svg>
-                </div>
-                <h3>Easy Returns</h3>
-                <p>Hassle free return policy</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer id="footer">
-        <div class="footer-grid">
-            <div>
-                <div class="footer-logo">BAZZAR</div>
-                <p class="footer-tagline">Shop smart, live better.<br />Your modern shopping destination.</p>
-            </div>
-            <div>
-                <h4>Quick Links</h4>
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#footer">Contact</a></li>
-                    <li><a href="#categories">Categories</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4>Categories</h4>
-                <ul>
-                    <li><a href="#" onclick="goToCategory('Electronics')">Electronics</a></li>
-                    <li><a href="#" onclick="goToCategory('Accessories')">Accessories</a></li>
-                    <li><a href="#" onclick="goToCategory('Fashion')">Fashion</a></li>
-                    <li><a href="#" onclick="goToCategory('Cosmetics')">Cosmetics</a></li>
-                    <li><a href="#" onclick="goToCategory('Home Appliances')">Home Appliances</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4>Contact</h4>
-                <ul>
-                    <li><a href="#">bazzar@email.com</a></li>
-                    <li><a href="#">+92 300 0000000</a></li>
-                    <li><a href="#">Karachi, Pakistan</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>2025 BAZZAR. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <!-- LOGIN MODAL -->
-    <div class="modal-overlay" id="loginModal">
-        <div class="modal">
-            <button class="close-btn" onclick="closeModal('loginModal')">&#x2715;</button>
-            <h2>Welcome Back</h2>
-            <div class="error-msg" id="loginError"></div>
-            <input type="email" id="loginEmail" placeholder="Email Address" />
-            <input type="password" id="loginPassword" placeholder="Password" />
-            <button class="btn-submit" onclick="handleLogin()">Login</button>
-            <p>Don't have an account? <a onclick="switchModal('loginModal','registerModal')">Register</a></p>
-        </div>
+      </div>
+      <div>
+        <h4>Categories</h4>
+        <ul>
+          <li><a href="#" onclick="goToCategory('Electronics')">Electronics</a></li>
+          <li><a href="#" onclick="goToCategory('Accessories')">Accessories</a></li>
+          <li><a href="#" onclick="goToCategory('Fashion')">Fashion</a></li>
+          <li><a href="#" onclick="goToCategory('Cosmetics')">Cosmetics</a></li>
+          <li><a href="#" onclick="goToCategory('Home Appliances')">Home Appliances</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="#">bazzar@email.com</a></li>
+          <li><a href="#">+92 300 0000000</a></li>
+          <li><a href="#">Karachi, Pakistan</a></li>
+        </ul>
+      </div>
     </div>
-
-    <!-- REGISTER MODAL -->
-    <div class="modal-overlay" id="registerModal">
-        <div class="modal">
-            <button class="close-btn" onclick="closeModal('registerModal')">&#x2715;</button>
-            <h2>Create Account</h2>
-            <div class="error-msg" id="registerError"></div>
-            <input type="text" id="registerName" placeholder="Full Name" />
-            <input type="email" id="registerEmail" placeholder="Email Address" />
-            <input type="password" id="registerPassword" placeholder="Password" />
-            <button class="btn-submit" onclick="handleRegister()">Register</button>
-            <p>Already have an account? <a onclick="switchModal('registerModal','loginModal')">Login</a></p>
-        </div>
+    <div class="footer-bottom">
+      <p>2025 BAZZAR. All rights reserved.</p>
     </div>
+  </footer>
 
-    <script>
-       const API = 'https://bazzar-backend-production.up.railway.app';
+  <!-- ============== LOGIN MODAL ============== -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal">
+      <button class="close-btn" onclick="closeModal('loginModal')">&#x2715;</button>
+      <h2>Welcome Back</h2>
+      <div class="error-msg" id="loginError"></div>
+      <input type="email" id="loginEmail" placeholder="Email Address" />
+      <input type="password" id="loginPassword" placeholder="Password" />
+      <button class="btn-submit" onclick="handleLogin()">Login</button>
+      <p>Don't have an account? <a onclick="switchModal('loginModal','registerModal')">Register</a></p>
+    </div>
+  </div>
 
-        function openModal(id) {
-            document.getElementById(id).classList.add('active');
-        }
+  <!-- ============== REGISTER MODAL ============== -->
+  <div class="modal-overlay" id="registerModal">
+    <div class="modal">
+      <button class="close-btn" onclick="closeModal('registerModal')">&#x2715;</button>
+      <h2>Create Account</h2>
+      <div class="error-msg" id="registerError"></div>
+      <input type="text" id="registerName" placeholder="Full Name" />
+      <input type="email" id="registerEmail" placeholder="Email Address" />
+      <input type="password" id="registerPassword" placeholder="Password" />
+      <button class="btn-submit" onclick="handleRegister()">Register</button>
+      <p>Already have an account? <a onclick="switchModal('registerModal','loginModal')">Login</a></p>
+    </div>
+  </div>
 
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
-        }
-
-        function switchModal(closeId, openId) {
-            closeModal(closeId);
-            openModal(openId);
-        }
-
-        function scrollToCategories() {
-            document.getElementById('categories').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function goToShop() {
-            window.location.href = 'shop.html';
-        }
-
-        function goToCategory(category) {
-            window.location.href = `shop.html?category=${category}`;
-        }
-
-        async function handleRegister() {
-            const name = document.getElementById('registerName').value.trim();
-            const email = document.getElementById('registerEmail').value.trim();
-            const password = document.getElementById('registerPassword').value.trim();
-            const errorDiv = document.getElementById('registerError');
-
-            if (!name || !email || !password) {
-                errorDiv.textContent = 'Please fill in all fields!';
-                return;
-            }
-
-            try {
-                const response = await fetch(`${API}/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, password })
-                });
-                const data = await response.json();
-
-                if (response.ok) {
-                    alert('Account created! Please login.');
-                    closeModal('registerModal');
-                    openModal('loginModal');
-                } else {
-                    errorDiv.textContent = data.message;
-                }
-            } catch (err) {
-                errorDiv.textContent = 'Could not connect to server!';
-            }
-        }
-
-        async function handleLogin() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
-            const errorDiv = document.getElementById('loginError');
-
-            if (!email || !password) {
-                errorDiv.textContent = 'Please fill in all fields!';
-                return;
-            }
-
-            try {
-                const response = await fetch(`${API}/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-                const data = await response.json();
-
-                if (response.ok) {
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
-
-                    if (data.user.role === 'admin') {
-                        window.location.href = 'admin.html';
-                    } else {
-                        window.location.href = 'shop.html';
-                    }
-                } else {
-                    errorDiv.textContent = data.message;
-                }
-            } catch (err) {
-                errorDiv.textContent = 'Could not connect to server!';
-            }
-        }
-
-        document.querySelectorAll('.modal-overlay').forEach(overlay => {
-            overlay.addEventListener('click', function (e) {
-                if (e.target === this) {
-                    this.classList.remove('active');
-                }
-            });
-        });
-
-    </script>
-
-
-    <script>
-        const navbar = document.querySelector('.navbar');
-        if (navbar) {
-            window.addEventListener('scroll', () => {
-                navbar.classList.toggle('scrolled', window.scrollY > 40);
-            });
-        }
-
-        // Fade-up on scroll
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(e => {
-                if (e.isIntersecting) e.target.classList.add('visible');
-            });
-        }, { threshold: 0.12 });
-        document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
-    </script>
+  <script src="js/index.js"></script>
 
 </body>
-
 </html>
