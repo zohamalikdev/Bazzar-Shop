@@ -19,6 +19,13 @@ let currentCategory = '';
 const user = JSON.parse(localStorage.getItem('user'));
 
 
+const params = new URLSearchParams(window.location.search);
+const category = params.get("category");
+
+console.log(category);
+
+
+
 /* ---------------- PAGE LOAD ---------------- */
 
 window.onload = function () {
@@ -61,38 +68,52 @@ async function loadProducts() {
   }
 }
 
+function formatPrice(price) {
+  return `Rs ${parseFloat(price).toLocaleString()}`;
+}
+
+// ──  the entire displayProducts() function 
+
 function displayProducts(products) {
   const grid = document.getElementById('productsGrid');
-
   if (products.length === 0) {
-    grid.innerHTML = '<p class="loading-text">No products found.</p>';
+    grid.innerHTML = '<p style="color:var(--text-light); grid-column:1/-1; text-align:center; padding:60px 0; font-size:14px;">No products found.</p>';
     return;
   }
 
   grid.innerHTML = products.map(p => `
     <div class="product-card">
+
+      <!-- Image + overlapping badge -->
       <div class="product-img-wrap">
-        <img src="${p.image_url}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/400x220?text=No+Image'"/>
+        <img
+          src="${p.image_url}"
+          alt="${p.name}"
+          onerror="this.src='https://via.placeholder.com/400x340?text=No+Image'"
+        />
         <span class="stock-badge ${p.stock > 0 ? 'in-stock' : 'out-stock'}">
           ${p.stock > 0 ? 'In Stock' : 'Out of Stock'}
         </span>
       </div>
+
+      <!-- Info -->
       <div class="product-info">
         <span class="product-category">${p.category}</span>
         <h3>${p.name}</h3>
         <p>${p.description}</p>
-        <div class="product-footer">
-          <div class="price">Rs ${parseFloat(p.price).toFixed(2)}</div>
-          <button class="btn-add-cart"
-            onclick="addToCart(${p.id}, '${p.name.replace(/'/g, "\\'")}', ${p.price}, '${p.image_url}')"
-            ${p.stock === 0 ? 'disabled' : ''}>
-            ${p.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
-          </button>
-        </div>
+        <div class="price">${formatPrice(p.price)}</div>
+        <button
+          class="btn-add-cart"
+          onclick="addToCart(${p.id}, '${p.name.replace(/'/g,"\\'")}', ${p.price}, '${p.image_url}')"
+          ${p.stock === 0 ? 'disabled' : ''}>
+          ${p.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+        </button>
       </div>
+
     </div>
   `).join('');
 }
+
 
 
 /* ---------------- SEARCH & FILTER ---------------- */
