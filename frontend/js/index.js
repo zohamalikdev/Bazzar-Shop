@@ -51,9 +51,8 @@ function goToShop() {
 
 // Go to the shop page, pre-filtered by a specific category
 function goToCategory(category) {
-  window.location.href = `shop.html?category=${category}`;
+  window.location.href = `shop.html?category=${(category)}`;
 }
-
 
 /* ---------------- REGISTER ---------------- */
 
@@ -143,6 +142,30 @@ if (navbar) {
     navbar.classList.toggle('scrolled', window.scrollY > 40);
   });
 }
+
+//  Category section Pill buttons when you'll click on them it will move u to the category of shop.html
+const categoryButtons = document.querySelectorAll("[data-category]");
+
+categoryButtons.forEach(button => {
+    button.addEventListener("click", function () {
+        const category = this.dataset.category;
+
+        if (category === "all") {
+            window.location.href = "shop.html";
+        } else {
+            window.location.href = `shop.html?category=${category}`;
+        }
+    });
+});
+
+document.querySelectorAll('.category-pills button').forEach(btn => {
+  btn.addEventListener('click', function () {
+    document.querySelectorAll('.category-pills button')
+      .forEach(b => b.classList.remove('active'));
+
+    this.classList.add('active');
+  });
+});
 
 
 /* ---------------- FADE-IN ON SCROLL ---------------- */

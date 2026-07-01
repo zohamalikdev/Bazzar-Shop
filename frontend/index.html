@@ -9,6 +9,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:wght@700;900&display=swap"
     rel="stylesheet" />
+
 </head>
 
 <body>
@@ -30,67 +31,166 @@
 
   <!-- ============== HERO SECTION ============== -->
   <section class="hero">
-    <div class="hero-text">
-      <span class="hero-tag">New Arrivals 2026</span>
-      <h1>Shop Smart,<br><span>Live Better</span></h1>
-      <p>Discover curated essentials for modern living. Quality products delivered to your doorstep.</p>
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+      <span class="hero-badge">BAZZAR BOOK STORE</span>
+      <h1>Welcome to our <span>book shop</span></h1>
+      <p>Discover timeless classics, bestsellers, and hidden gems curated for every reader.</p>
+
       <div class="hero-buttons">
-        <button class="btn-main" onclick="goToShop()">Shop Now</button>
-        <button class="btn-secondary" onclick="scrollToCategories()">Browse Categories</button>
-      </div>
-      <div class="hero-stats">
-        <div class="stat-item"><strong>10K+</strong><span>Products</span></div>
-        <div class="stat-divider"></div>
-        <div class="stat-item"><strong>50K+</strong><span>Customers</span></div>
-        <div class="stat-divider"></div>
-        <div class="stat-item"><strong>4.9</strong><span>Rating</span></div>
+        <button class="btn-main" onclick="goToShop()">Shop Books</button>
+        <button class="btn-secondary" onclick="scrollToCategories()">Browse Genres</button>
       </div>
     </div>
   </section>
 
   <!-- ============== CATEGORIES SECTION ============== -->
-  <section class="categories-section" id="categories">
-    <div class="section-header">
-      <h2 class="section-title">Browse Our <span>Categories</span></h2>
-      <p class="section-subtitle">Find everything you need in one place</p>
+ 
+<section class="categories-section" id="categories">
+
+ <!-- Heading -->
+  <div class="section-header">
+    <h2 class="section-title">Browse Our <span>Categories</span></h2>
+    <p>Find your next favorite read</p>
+  </div>
+
+   <!-- Category Pills -->
+  <div class="category-pills">
+    <button class="active" onclick="goToShop()">All</button>
+    <button onclick="goToCategory('Fiction')">Fiction</button>
+    <button onclick="goToCategory('Academic')">Academic</button>
+    <button onclick="goToCategory('Islamic')">Islamic</button>
+    <button onclick="goToCategory('Children')">Children</button>
+    <button onclick="goToCategory('Self Help')">Self Help</button>
+  </div>
+
+ 
+
+  <!-- Slider Wrapper -->
+  <div class="categories-slider">
+
+    <!-- Moving Row -->
+    <div class="categories-row">
+
+      <!-- ORIGINAL CARDS -->
+
+      <div class="category-card" >
+        <img src="./images/harry potter.jpg" alt="Fiction Book">
+        <span class="floating-tag">FICTION</span>
+        <div class="category-content">
+          <h3>Fiction</h3>
+          <p>Stories that transport you into another world.</p>
+           <button onclick="goToCategory('Fiction')">Explore</button>
+        </div>
+      </div>
+
+      <div class="category-card" >
+        <img src="./images/selfhelp.jpg" alt="Self Help Book">
+        <span class="floating-tag">SELF HELP</span>
+        <div class="category-content">
+          <h3>Self Help</h3>
+          <p>Learn, grow and improve every day.</p>
+           <button onclick="goToCategory('Self Help')">Explore</button>
+                </div>
+      </div>
+
+      <div class="category-card">
+        <img src="./images/academic.jpg" alt="Academic Book">
+        <span class="floating-tag">ACADEMIC</span>
+        <div class="category-content">
+          <h3>Academic</h3>
+          <p>Essential textbooks and learning resources.</p>
+           <button onclick="goToCategory('Academic')">Explore</button>
+        </div>
+      </div>
+
+      <div class="category-card" >
+        <img src="./images/chid-book.jpg" alt="Children Book">
+        <span class="floating-tag">CHILDREN</span>
+        <div class="category-content">
+          <h3>Children</h3>
+          <p>Books filled with fun, learning and imagination.</p>
+           <button onclick="goToCategory('Children')">Explore</button>
+        </div>
+      </div>
+
+      <div class="category-card" >
+        <img src="./images/islamic.jpg" alt="Islamic Book">
+        <span class="floating-tag">ISLAMIC</span>
+        <div class="category-content">
+          <h3>Islamic</h3>
+          <p>Faith, spirituality and timeless knowledge.</p>
+           <button onclick="goToCategory('Islamic')">Explore</button>
+        </div>
+      </div>
+
+      <!-- DUPLICATE CARDS FOR INFINITE SLIDE -->
+
+      <div class="category-card">
+        <img src="./images/harry potter.jpg" alt="Fiction Book">
+        <span class="floating-tag">FICTION</span>
+        <div class="category-content">
+          <h3>Fiction</h3>
+          <p>Stories that transport you into another world.</p>
+           <button onclick="goToCategory('Fiction')">Explore</button>
+        </div>
+      </div>
+
+      <div class="category-card" >
+        <img src="./images/selfhelp.jpg" alt="Self Help Book">
+        <span class="floating-tag">SELF HELP</span>
+        <div class="category-content">
+          <h3>Self Help</h3>
+          <p>Learn, grow and improve every day.</p>
+           <button onclick="goToCategory('Self Help')">Explore</button>
+        </div>
+      </div>
+
+      <div class="category-card" >
+        <img src="./images/academic.jpg" alt="Academic Book">
+        <span class="floating-tag">ACADEMIC</span>
+        <div class="category-content">
+          <h3>Academic</h3>
+          <p>Essential textbooks and learning resources.</p>
+          <button onclick="goToCategory('Academic')">Explore</button>
+        </div>
+      </div>
+
+      <div class="category-card" >
+        <img src="./images/chid-book.jpg" alt="Children Book">
+        <span class="floating-tag">CHILDREN</span>
+        <div class="category-content">
+          <h3>Children</h3>
+          <p>Books filled with fun, learning and imagination.</p>
+          <button onclick="goToCategory('Children')">Explore</button>
+        </div>
+      </div>
+
+      <div class="category-card" >
+        <img src="./images/islamic.jpg" alt="Islamic Book">
+        <span class="floating-tag">ISLAMIC</span>
+        <div class="category-content">
+          <h3>Islamic</h3>
+          <p>Faith, spirituality and timeless knowledge.</p>
+           <button onclick="goToCategory('Islamic')">Explore</button>
+        </div>
+      </div>
+
     </div>
-    <div class="categories-grid">
-      <div class="category-card" onclick="goToCategory('Electronics')">
-        <img src="./images/watch.jpg" alt="Electronics" />
-        <div class="cat-overlay"></div>
-        <span class="cat-label">Electronics</span>
-      </div>
-      <div class="category-card" onclick="goToCategory('Accessories')">
-        <img src="./images/perfume.jpg" alt="Accessories" />
-        <div class="cat-overlay"></div>
-        <span class="cat-label">Accessories</span>
-      </div>
-      <div class="category-card" onclick="goToCategory('Fashion')">
-        <img src="./images/fashion.jpg" alt="Fashion" />
-        <div class="cat-overlay"></div>
-        <span class="cat-label">Fashion</span>
-      </div>
-      <div class="category-card" onclick="goToCategory('Cosmetics')">
-        <img src="./images/cosmetics.jpg" alt="Cosmetics" />
-        <div class="cat-overlay"></div>
-        <span class="cat-label">Cosmetics</span>
-      </div>
-      <div class="category-card category-card--wide" onclick="goToCategory('Home Appliances')">
-        <img src="./images/toaster.jpg" alt="Home Appliances" />
-        <div class="cat-overlay"></div>
-        <span class="cat-label">Home Appliances</span>
-      </div>
-    </div>
-  </section>
+  </div>
+</section>
+
 
   <!-- ============== ABOUT SECTION ============== -->
   <section id="about" class="about-section">
     <div class="about-inner">
       <h2 class="section-title">About <span>BAZZAR</span></h2>
       <p>
-        BAZZAR is your one-stop destination for curated modern essentials.
-        From electronics to fashion, we bring you quality products at great prices.
-        Our mission is simple — help you shop smart and live better.
+        BAZZAR is more than a marketplace — it’s a curated destination
+        for readers who love discovering meaningful books.
+        From timeless classics to modern bestsellers, we bring stories
+        that inspire, educate, and entertain.
       </p>
     </div>
   </section>
@@ -123,7 +223,8 @@
       <div class="feature-item">
         <div class="feature-icon-wrap">
           <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            <polygon
+              points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
           </svg>
         </div>
         <h3>High Quality</h3>
@@ -147,7 +248,7 @@
     <div class="footer-grid">
       <div>
         <div class="footer-logo">BAZZAR</div>
-        <p class="footer-tagline">Shop smart, live better.<br />Your modern shopping destination.</p>
+        <p class="footer-tagline">Where a world of books meets your fingertips.<br />Discover your next great read.</p>
       </div>
       <div>
         <h4>Quick Links</h4>
@@ -161,11 +262,11 @@
       <div>
         <h4>Categories</h4>
         <ul>
-          <li><a href="#" onclick="goToCategory('Electronics')">Electronics</a></li>
-          <li><a href="#" onclick="goToCategory('Accessories')">Accessories</a></li>
-          <li><a href="#" onclick="goToCategory('Fashion')">Fashion</a></li>
-          <li><a href="#" onclick="goToCategory('Cosmetics')">Cosmetics</a></li>
-          <li><a href="#" onclick="goToCategory('Home Appliances')">Home Appliances</a></li>
+          <li><a href="#" onclick="goToCategory('Fiction')">Fiction</a></li>
+          <li><a href="#" onclick="goToCategory('Academic')">Academic</a></li>
+          <li><a href="#" onclick="goToCategory('Islamic')">Islamic</a></li>
+          <li><a href="#" onclick="goToCategory('Children')">Children</a></li>
+          <li><a href="#" onclick="goToCategory('Self Help')">Self Help</a></li>
         </ul>
       </div>
       <div>
@@ -212,4 +313,5 @@
   <script src="js/index.js"></script>
 
 </body>
+
 </html>
