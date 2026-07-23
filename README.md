@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-# BAZZAR E-Commerce Platform
-=======
 # BAZZAR — Online Book Store
->>>>>>> b1c11af (cart issue ressolved)
 
 A full-stack e-commerce web application for buying books online, built with vanilla HTML/CSS/JavaScript, Node.js, Express.js, and PostgreSQL.
 
