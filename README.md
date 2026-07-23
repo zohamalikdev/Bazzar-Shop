@@ -1,4 +1,4 @@
-# BAZZAR / MODRN E-Commerce Platform
+# BAZZAR E-Commerce Platform
 
 A full-stack e-commerce web application built using HTML, CSS, JavaScript, Node.js, Express.js, and PostgreSQL.
 
