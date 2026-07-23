@@ -22,7 +22,6 @@ const user = JSON.parse(localStorage.getItem('user'));
 const params = new URLSearchParams(window.location.search);
 const category = params.get("category");
 
-console.log(category);
 
 
 
@@ -314,7 +313,9 @@ async function showOrders() {
   if (!user) return;
 
   try {
-    const res = await fetch(`${API}/orders/user/${user.id}`);
+    const res = await fetch(`${API}/orders/user/${user.id}`, {
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    });
     const orders = await res.json();
 
     const list = document.getElementById('ordersList');
@@ -352,7 +353,10 @@ async function deleteProfile() {
   if (!confirm('Are you sure you want to delete your account? This cannot be undone!')) return;
 
   try {
-    await fetch(`${API}/user/${user.id}`, { method: 'DELETE' });
+    await fetch(`${API}/user/${user.id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    });
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     alert('Account deleted.');

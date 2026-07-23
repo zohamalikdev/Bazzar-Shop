@@ -20,6 +20,29 @@ app.use(cors({
 
 app.use(express.json());
 
+// ==================== AUTH MIDDLEWARE ====================
+
+// Verifies the JWT token sent in the Authorization: Bearer <token> header.
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ message: 'Access denied. Please log in.' });
+  try {
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    next();
+  } catch (err) {
+    return res.status(403).json({ message: 'Invalid or expired token.' });
+  }
+}
+
+// Must run AFTER authenticateToken — rejects non-admins.
+function requireAdmin(req, res, next) {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Admin access required.' });
+  }
+  next();
+}
+
 // ==================== AUTH ROUTES ====================
 
 // REGISTER
@@ -88,8 +111,13 @@ app.post('/login', async (req, res) => {
 });
 
 // DELETE PROFILE
-app.delete('/user/:id', async (req, res) => {
+app.delete('/user/:id', authenticateToken, async (req, res) => {
   const { id } = req.params;
+
+  // Users can only delete their own account
+  if (parseInt(id) !== req.user.id) {
+    return res.status(403).json({ message: 'You can only delete your own account.' });
+  }
 
   try {
     await pool.query('DELETE FROM users WHERE id = $1', [id]);
@@ -129,7 +157,7 @@ app.get('/products', async (req, res) => {
 });
 
 // ADD PRODUCT
-app.post('/products', async (req, res) => {
+app.post('/products', authenticateToken, requireAdmin, async (req, res) => {
   const { name, description, price, image_url, category, stock } = req.body;
 
   try {
@@ -146,7 +174,7 @@ app.post('/products', async (req, res) => {
 });
 
 // UPDATE PRODUCT
-app.put('/products/:id', async (req, res) => {
+app.put('/products/:id', authenticateToken, requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { name, description, price, image_url, category, stock } = req.body;
 
@@ -164,7 +192,7 @@ app.put('/products/:id', async (req, res) => {
 });
 
 // DELETE PRODUCT
-app.delete('/products/:id', async (req, res) => {
+app.delete('/products/:id', authenticateToken, requireAdmin, async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -182,8 +210,33 @@ app.delete('/products/:id', async (req, res) => {
 app.post('/orders', async (req, res) => {
   const { user_id, full_name, phone, address, total, items } = req.body;
 
+  // Use a dedicated client so we can wrap everything in a transaction.
+  // If anything fails mid-way, ROLLBACK ensures no partial writes hit the DB.
+  const client = await pool.connect();
+
   try {
-    const orderResult = await pool.query(
+    await client.query('BEGIN');
+
+    // Pre-check: verify sufficient stock for EVERY item before touching anything.
+    // This prevents negative stock caused by over-ordering.
+    for (let item of items) {
+      const { rows } = await client.query(
+        'SELECT stock, name FROM products WHERE id = $1',
+        [item.product_id]
+      );
+      if (rows.length === 0) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({ message: 'A product in your cart no longer exists.' });
+      }
+      if (rows[0].stock < item.quantity) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({
+          message: `Not enough stock for "${rows[0].name}". Only ${rows[0].stock} left.`
+        });
+      }
+    }
+
+    const orderResult = await client.query(
       'INSERT INTO orders (user_id, full_name, phone, address, total) VALUES ($1,$2,$3,$4,$5) RETURNING *',
       [user_id, full_name, phone, address, total]
     );
@@ -191,16 +244,18 @@ app.post('/orders', async (req, res) => {
     const order = orderResult.rows[0];
 
     for (let item of items) {
-      await pool.query(
+      await client.query(
         'INSERT INTO order_items (order_id, product_id, quantity, price) VALUES ($1,$2,$3,$4)',
         [order.id, item.product_id, item.quantity, item.price]
       );
 
-      await pool.query(
+      await client.query(
         'UPDATE products SET stock = stock - $1 WHERE id = $2',
         [item.quantity, item.product_id]
       );
     }
+
+    await client.query('COMMIT');
 
     res.json({
       message: `Thank you ${full_name}! Your order has been placed.`,
@@ -208,12 +263,15 @@ app.post('/orders', async (req, res) => {
     });
 
   } catch (err) {
+    await client.query('ROLLBACK');
     res.status(500).json({ message: 'Server error: ' + err.message });
+  } finally {
+    client.release(); // always return the client to the pool
   }
 });
 
 // GET USER ORDERS
-app.get('/orders/user/:user_id', async (req, res) => {
+app.get('/orders/user/:user_id', authenticateToken, async (req, res) => {
   const { user_id } = req.params;
 
   try {
@@ -229,8 +287,8 @@ app.get('/orders/user/:user_id', async (req, res) => {
   }
 });
 
-// GET ALL ORDERS
-app.get('/orders', async (req, res) => {
+// GET ALL ORDERS (admin only)
+app.get('/orders', authenticateToken, requireAdmin, async (req, res) => {
   try {
     const result = await pool.query(
       'SELECT orders.*, users.name as customer_name FROM orders LEFT JOIN users ON orders.user_id = users.id ORDER BY created_at DESC'
@@ -243,8 +301,8 @@ app.get('/orders', async (req, res) => {
   }
 });
 
-// UPDATE ORDER STATUS
-app.put('/orders/:id/status', async (req, res) => {
+// UPDATE ORDER STATUS (admin only)
+app.put('/orders/:id/status', authenticateToken, requireAdmin, async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
 

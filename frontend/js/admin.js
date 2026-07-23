@@ -6,6 +6,11 @@
 
 const API = 'https://bazzar-backend-production.up.railway.app';
 
+// Returns the stored JWT as a ready-to-use Authorization header value
+function token() {
+  return localStorage.getItem('token');
+}
+
 // Guard: only logged-in admins can use this page
 const user = JSON.parse(localStorage.getItem('user'));
 if (!user || user.role !== 'admin') {
@@ -39,7 +44,9 @@ async function loadStats() {
   try {
     const [productsRes, ordersRes] = await Promise.all([
       fetch(`${API}/products`),
-      fetch(`${API}/orders`)
+      fetch(`${API}/orders`, {
+        headers: { 'Authorization': `Bearer ${token()}` }
+      })
     ]);
 
     const products = await productsRes.json();
@@ -142,7 +149,10 @@ async function saveProduct() {
   try {
     const res = await fetch(`${API}/products${id ? '/' + id : ''}`, {
       method: id ? 'PUT' : 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token()}`
+      },
       body: JSON.stringify(productData)
     });
 
@@ -162,7 +172,10 @@ async function deleteProduct(id) {
   if (!confirm('Are you sure you want to delete this product?')) return;
 
   try {
-    await fetch(`${API}/products/${id}`, { method: 'DELETE' });
+    await fetch(`${API}/products/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token()}` }
+    });
     loadProducts();
     loadStats();
   } catch (err) {
@@ -175,7 +188,9 @@ async function deleteProduct(id) {
 
 async function loadOrders() {
   try {
-    const res = await fetch(`${API}/orders`);
+    const res = await fetch(`${API}/orders`, {
+      headers: { 'Authorization': `Bearer ${token()}` }
+    });
     const orders = await res.json();
 
     document.getElementById('ordersBody').innerHTML = orders.map(o => `
@@ -205,7 +220,10 @@ async function updateStatus(orderId, newStatus) {
   try {
     await fetch(`${API}/orders/${orderId}/status`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token()}`
+      },
       body: JSON.stringify({ status: newStatus })
     });
   } catch (err) {
