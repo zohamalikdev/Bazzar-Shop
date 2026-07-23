@@ -6,8 +6,8 @@
 
 const API = 'https://bazzar-backend-production.up.railway.app';
 
-// In-memory cart — resets if the page is refreshed (a known limitation)
-let cart = [];
+// Cart is persisted in localStorage so it survives page refreshes.
+let cart = JSON.parse(localStorage.getItem('bazzar_cart')) || [];
 
 // All products currently loaded for the active category (used by search)
 let allProducts = [];
@@ -48,6 +48,8 @@ window.onload = function () {
     });
   }
 
+  // Restore cart badge and items from localStorage on every page load
+  updateCartUI();
   loadProducts();
 };
 
@@ -167,6 +169,9 @@ function removeFromCart(id) {
 }
 
 function updateCartUI() {
+  // Persist the current cart state to localStorage on every update
+  localStorage.setItem('bazzar_cart', JSON.stringify(cart));
+
   const badge = document.getElementById('cartBadge');
   const itemsDiv = document.getElementById('cartItems');
   const totalDiv = document.getElementById('cartTotal');
@@ -280,6 +285,7 @@ async function placeOrder() {
       document.getElementById('cartPanel').classList.remove('open');
       showReceipt(fullName, phone, address, total);
       cart = [];
+      localStorage.removeItem('bazzar_cart'); // clear persisted cart after order
       updateCartUI();
     } else {
       alert('Error: ' + data.message);

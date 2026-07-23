@@ -1,0 +1,255 @@
+# 🛒 Bazzar — Complete Project Deep Dive
+
+## 1. What is Bazzar? What Problem Does It Solve? Who Uses It?
+
+**Bazzar** (also styled as *Modrn*) is a **full-stack online bookstore** — a niche e-commerce platform purpose-built to sell books in Pakistan.
+
+### The Problem It Solves
+It provides a clean, user-friendly way to browse and purchase books online, organized by genre (Fiction, Academic, Islamic, Children, Self Help), with a simple checkout flow using Cash-on-Delivery (COD) style order placement. Think of it as a lightweight, custom-built alternative to Daraz or Kitaboon, specifically for books.
+
+### Who Uses It?
+| Persona | What They Do |
+|---|---|
+| **Guest / Visitor** | Browses books, categories, and landing page |
+| **Registered Customer** | Creates an account, shops, checks out, tracks their orders |
+| **Admin (Zoha Malik)** | Manages the product catalog and monitors/fulfills all orders |
+
+### Real-World Use Case
+A customer visits the site → browses book categories → adds books to cart → checks out by entering their name, phone, and delivery address → receives an order confirmation receipt on-screen. The admin then logs into their dashboard to see the order and update its status (Pending → Processing → Shipping → Delivered).
+
+---
+
+## 2. Project Structure
+
+```
+modrn/
+├── backend/
+│   ├── server.js          ← All API routes (Auth + Products + Orders)
+│   ├── db.js              ← PostgreSQL connection pool (pg)
+│   ├── .env               ← DB credentials + JWT_SECRET + PORT
+│   └── package.json       ← Node.js dependencies
+│
+├── frontend/
+│   ├── index.html         ← Landing page (hero, categories, about)
+│   ├── shop.html          ← Product listing + cart + checkout
+│   ├── admin.html         ← Admin dashboard (sidebar SPA layout)
+│   ├── style.css          ← All styles in one 55KB CSS file
+│   └── js/
+│       ├── index.js       ← Login/register logic, nav, scroll effects
+│       ├── shop.js        ← Products, cart, checkout, my orders
+│       └── admin.js       ← CRUD products, view/update orders, stats
+│
+└── docs/                  ← Mirror of the frontend (likely for deployment)
+```
+
+---
+
+## 3. Frontend — How It's Built & Deployed
+
+The frontend is **pure vanilla HTML + CSS + JavaScript** — no framework, no build step, no bundler.
+
+### Pages
+
+| File | Purpose |
+|---|---|
+| [index.html](file:///d:/Desktop/projectx/modrn/frontend/index.html) | Landing page — hero banner, category slider (auto-scroll), about, features, login/register modals |
+| [shop.html](file:///d:/Desktop/projectx/modrn/frontend/shop.html) | The actual shop — product grid, search bar, category filter pills, slide-in cart panel, delivery modal, receipt modal, "My Orders" modal |
+| [admin.html](file:///d:/Desktop/projectx/modrn/frontend/admin.html) | Admin SPA — sidebar layout with Dashboard, Products (CRUD table), Orders sections |
+
+### Notable Frontend Design Decisions
+- **Google Fonts**: Uses `Plus Jakarta Sans` (body) + `Fraunces` (headings) — premium typographic choices.
+- **Infinite category slider**: The category cards are duplicated in the DOM to create a seamless CSS `animation` loop — no JS needed for this.
+- **Scroll-aware navbar**: Uses a `scroll` event listener + `classList.toggle('scrolled')` for a frosted background on scroll.
+- **Fade-in animations**: Uses the `IntersectionObserver` API to trigger `.visible` class CSS transitions as elements scroll into view.
+- **Cart is in-memory only** — lives in a `let cart = []` variable. If you refresh the page, the cart is gone. This is a known limitation documented in the code comments.
+
+### Is It Deployed?
+The backend is deployed on **Railway** at:
+```
+https://bazzar-backend-production.up.railway.app
+```
+This URL is hardcoded as `const API = '...'` at the top of all three JS files. The frontend itself appears to be served statically — either opened directly in a browser or via a static host (the `docs/` folder suggests GitHub Pages may have been considered).
+
+---
+
+## 4. Backend — Node.js / Express on Railway
+
+### Architecture
+It's a **single-file monolith** — all 269 lines of API logic live in [server.js](file:///d:/Desktop/projectx/modrn/backend/server.js). There are no separate route files, controllers, or middleware layers. Simple, but it works.
+
+### Dependencies ([package.json](file:///d:/Desktop/projectx/modrn/backend/package.json))
+| Package | Why |
+|---|---|
+| `express ^5.2.1` | Web framework / routing |
+| `pg ^8.20.0` | PostgreSQL client (node-postgres) |
+| `bcryptjs ^3.0.3` | Password hashing (salt rounds: 10) |
+| `jsonwebtoken ^9.0.3` | JWT auth tokens (7-day expiry) |
+| `cors ^2.8.6` | Cross-Origin Resource Sharing (allows `*` — any origin) |
+| `dotenv ^17.4.2` | Loads `.env` variables |
+
+### API Endpoints
+
+#### Auth Routes
+| Method | Endpoint | What It Does |
+|---|---|---|
+| `POST` | `/register` | Creates a user (hashes password, role = `'user'`) |
+| `POST` | `/login` | Validates credentials, returns JWT + user `{id, name, role}` |
+| `DELETE` | `/user/:id` | Deletes a user account |
+
+#### Product Routes
+| Method | Endpoint | What It Does |
+|---|---|---|
+| `GET` | `/products` | Fetches all products; supports `?search=` and `?category=` query params (ILIKE for case-insensitive search) |
+| `POST` | `/products` | Creates a new product |
+| `PUT` | `/products/:id` | Updates an existing product |
+| `DELETE` | `/products/:id` | Deletes a product |
+
+#### Order Routes
+| Method | Endpoint | What It Does |
+|---|---|---|
+| `POST` | `/orders` | Places an order — inserts into `orders` + `order_items`, **decrements stock** per item |
+| `GET` | `/orders/user/:user_id` | Fetches a specific user's order history |
+| `GET` | `/orders` | Fetches ALL orders (admin) — LEFT JOIN with users for customer name |
+| `PUT` | `/orders/:id/status` | Updates order status (Pending/Processing/Shipping/Delivered) |
+
+> [!WARNING]
+> **No auth middleware on admin routes.** Any endpoint (`POST /products`, `DELETE /products/:id`, `GET /orders`) can be called by anyone who knows the URL — there's no JWT verification middleware protecting these routes. The frontend does a client-side role check (`if user.role !== 'admin' → redirect`), but this is bypassable via DevTools or curl.
+
+---
+
+## 5. Database — PostgreSQL on Neon
+
+The database connection is in [db.js](file:///d:/Desktop/projectx/modrn/backend/db.js), using `pg.Pool` with SSL (`rejectUnauthorized: false`) — standard for Neon's free-tier serverless PostgreSQL.
+
+### Tables (Inferred from SQL queries in server.js)
+
+#### `users`
+| Column | Type | Notes |
+|---|---|---|
+| `id` | serial PK | Auto-increment |
+| `name` | varchar | Full name |
+| `email` | varchar | Unique |
+| `password` | varchar | bcrypt hash |
+| `role` | varchar | `'user'` or `'admin'` |
+
+#### `products`
+| Column | Type | Notes |
+|---|---|---|
+| `id` | serial PK | |
+| `name` | varchar | |
+| `description` | text | |
+| `price` | numeric | In Pakistani Rupees (Rs) |
+| `image_url` | varchar | External URL |
+| `category` | varchar | Fiction / Academic / Islamic / Children / Self Help |
+| `stock` | integer | Decremented on order placement |
+
+#### `orders`
+| Column | Type | Notes |
+|---|---|---|
+| `id` | serial PK | |
+| `user_id` | integer FK → users | Nullable (guest checkout supported) |
+| `full_name` | varchar | Delivery name |
+| `phone` | varchar | |
+| `address` | text | Delivery address |
+| `total` | numeric | Cart total |
+| `status` | varchar | Defaults to `'Pending'` |
+| `created_at` | timestamp | Auto (DEFAULT NOW()) |
+
+#### `order_items`
+| Column | Type | Notes |
+|---|---|---|
+| `id` | serial PK | |
+| `order_id` | integer FK → orders | |
+| `product_id` | integer FK → products | |
+| `quantity` | integer | |
+| `price` | numeric | Price at time of purchase (snapshot) |
+
+---
+
+## 6. Core Features — What Users Can Actually Do
+
+### Customer Flow
+```
+Landing Page → Browse Categories → Shop Page → Filter/Search → Add to Cart → Checkout → Receipt
+```
+
+1. **Register / Login** — Modal pop-ups on the home page. JWT token + user object stored in `localStorage`.
+2. **Role-based redirect** — Admins go to `admin.html`, regular users go to `shop.html` after login.
+3. **Browse & Filter** — Products load from the API. Filter by category via pill buttons or search by name/description client-side.
+4. **Cart** — Slide-in panel from the right. Add items, remove items, see running total. Cart badge on the icon updates live.
+5. **Stock awareness** — "Out of Stock" badge on product cards; Add to Cart button is disabled if `stock === 0`.
+6. **Checkout (COD)** — Fill in name, phone, address. On confirm → POST to `/orders` → cart cleared → receipt modal shown.
+7. **Guest Checkout** — Works without an account (`user_id: null` is sent).
+8. **My Orders** — Logged-in users can view their order history with status badges (Pending/Processing/Shipping/Delivered).
+9. **Delete Profile** — Users can permanently delete their own account from the user dropdown.
+10. **Logout** — Clears `localStorage`, redirects to home.
+
+---
+
+## 7. Admin Panel — What It Does
+
+Accessible only at `admin.html`. The JS file immediately guards access:
+```js
+if (!user || user.role !== 'admin') window.location.href = 'index.html';
+```
+
+It's a **single-page app (SPA) within a sidebar layout** — one HTML file with three `<div>` sections toggled by `display: none/block`.
+
+### Dashboard Section
+- Shows **3 stat cards**: Total Products, Total Orders, Total Revenue (sum of all `order.total`)
+- Revenue is calculated client-side by summing all order totals fetched from the API.
+
+### Products Section
+- Full **CRUD table** — Image, Name, Category, Price, Stock, Actions (Edit / Delete)
+- **Add Product** button opens a modal form (name, description, price, image URL, category dropdown, stock)
+- **Edit** pre-fills the same modal and PUTs to the API
+- **Delete** confirms and DELETEs
+
+### Orders Section
+- Table of **all orders** (Order ID, Customer, Phone, Address, Total, Date, Status)
+- **Status dropdown per row** — changing it immediately fires a `PUT /orders/:id/status` call — no save button needed.
+
+---
+
+## 8. Tech Choices — The "Why"
+
+### Why Node.js + Express instead of Django or Next.js?
+
+| Choice | Rationale |
+|---|---|
+| **Node.js / Express** | Lightweight, fast to set up for a REST API. Express v5 is used, which is the latest major. Great for simple CRUD without needing Django's ORM, admin, or Python ecosystem. |
+| **Not Django** | Django is heavier, opinionated, and Python-based — overkill for a simple 5-route API. Would add unnecessary setup complexity for a small project. |
+| **Not Next.js** | The frontend is purely static HTML/CSS/JS — no React needed. Next.js would be over-engineering a project that doesn't need SSR, component trees, or a build pipeline. The separation of frontend/backend is deliberate and clean. |
+
+### Why PostgreSQL?
+- **Relational data fits naturally** — orders relate to users and products through foreign keys. PostgreSQL handles this elegantly.
+- **Neon** (serverless Postgres) provides a **free-tier** managed database with a connection URL — zero infrastructure to manage.
+- Alternatives like MongoDB would lose the relational integrity between `orders`, `order_items`, and `products`.
+
+### Why Railway for the backend?
+- **Railway** offers a simple Git-push deployment for Node.js apps with auto-detect, no Dockerfile needed.
+- Free/low-cost tier works perfectly for a personal project or MVP.
+- Alternatives (Render, Heroku, Fly.io) would work too — Railway is just the fastest to set up.
+
+### Why Neon for the database?
+- **Neon** is serverless PostgreSQL — scales to zero when idle (great for dev/low-traffic projects, no idle billing).
+- Provides a standard `pg`-compatible connection string with SSL out of the box.
+- The `rejectUnauthorized: false` in `db.js` is specifically there to handle Neon's self-signed certs in some connection modes.
+
+---
+
+## 9. Known Gaps & Potential Improvements
+
+> [!NOTE]
+> These are observations — not criticisms. For a learning project / MVP, this is solid work.
+
+| Gap | Impact | Fix |
+|---|---|---|
+| No auth middleware on backend routes | High — product deletion/creation unprotected | Add `authenticateAdmin` middleware using `jwt.verify()` |
+| Cart is in-memory (resets on refresh) | Medium | Use `localStorage` to persist cart |
+| No payment gateway | Low for COD, High for online payment | Integrate Stripe / JazzCash |
+| No image upload | Medium — images require external URLs | Add Multer + Cloudinary for uploads |
+| No input sanitization/validation | Medium | Use `express-validator` or `zod` |
+| `DELETE /user/:id` has no auth check | High — anyone can delete any user by ID | Require JWT + match user ID |
+| CORS set to `*` | Low-Medium | Restrict to your frontend domain in production |
+| No pagination on `/products` | Low now, High at scale | Add `LIMIT` / `OFFSET` query params |
